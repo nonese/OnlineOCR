@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Online OCR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div class="hero__text">
+          <h1>Online OCR</h1>
+          <p>Upload an image and let our OCR engine extract text instantly.</p>
+        </div>
+        <div class="hero__badge">AI Powered</div>
+      </header>
+
+      <main class="card">
+        <section class="uploader" id="drop-zone">
+          <input id="file-input" type="file" accept="image/*" hidden />
+          <div class="uploader__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 3a5 5 0 0 0-5 5h2a3 3 0 1 1 6 0h2a5 5 0 0 0-5-5Zm0 6.5 3 3h-2v5h-2v-5H9l3-3ZM5 13h2v6h10v-6h2v8H5v-8Z"
+                fill="currentColor"
+              ></path>
+            </svg>
+          </div>
+          <p class="uploader__headline">Drag & drop your image here</p>
+          <p class="uploader__subtitle">or <button id="browse-btn">browse files</button></p>
+        </section>
+
+        <section class="preview" id="preview" hidden>
+          <img id="preview-image" alt="Preview" />
+        </section>
+
+        <section class="results" id="results" hidden>
+          <div class="results__header">
+            <h2>Extracted text</h2>
+            <span class="tag" id="confidence"></span>
+          </div>
+          <pre id="output"></pre>
+        </section>
+      </main>
+
+      <footer class="footer">Made with Flask &amp; EasyOCR</footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+  </body>
+</html>
