@@ -59,14 +59,30 @@ def perform_ocr():
 
     results = READER.readtext(image_stream.read(), detail=1, paragraph=True)
 
-    extracted_text = "\n".join([text for _, text, _ in results]) if results else ""
+    segments = []
+    for result in results:
+        if len(result) == 3:
+            bbox, text, confidence = result
+        elif len(result) == 2:
+            bbox, text = result
+            confidence = None
+        else:
+            # Skip unexpected result shapes to avoid breaking the API response.
+            continue
+
+        segments.append(
+            {
+                "bbox": bbox,
+                "text": text,
+                "confidence": float(confidence) if confidence is not None else None,
+            }
+        )
+
+    extracted_text = "\n".join([segment["text"] for segment in segments]) if segments else ""
 
     response = {
         "text": extracted_text,
-        "segments": [
-            {"bbox": bbox, "text": text, "confidence": float(confidence)}
-            for bbox, text, confidence in results
-        ],
+        "segments": segments,
         "filename": uploaded_file.filename,
     }
     return jsonify(response)
