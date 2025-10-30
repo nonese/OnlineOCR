@@ -1,8 +1,9 @@
 import io
 import os
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from flask import Flask, jsonify, render_template, request
 
@@ -21,12 +22,17 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 app = Flask(__name__)
 
 
-def _init_reader() -> "easyocr.Reader":
-    languages: List[str] = ["en"]
+LANGUAGE_MAP: Dict[str, List[str]] = {
+    "en": ["en"],
+    "zh": ["ch_sim", "en"],
+}
+DEFAULT_LANGUAGE = "en"
+
+
+@lru_cache(maxsize=None)
+def _get_reader(language_code: str) -> "easyocr.Reader":
+    languages = LANGUAGE_MAP.get(language_code, LANGUAGE_MAP[DEFAULT_LANGUAGE])
     return easyocr.Reader(languages, gpu=False)
-
-
-READER = _init_reader()
 
 
 def _save_upload(file_storage) -> Path:
@@ -52,12 +58,17 @@ def perform_ocr():
     if uploaded_file.filename == "":
         return jsonify({"error": "Empty filename"}), 400
 
+    requested_language = request.form.get("language", DEFAULT_LANGUAGE).lower()
+    if requested_language not in LANGUAGE_MAP:
+        requested_language = DEFAULT_LANGUAGE
+
     saved_path = _save_upload(uploaded_file)
 
     image_bytes = saved_path.read_bytes()
     image_stream = io.BytesIO(image_bytes)
 
-    results = READER.readtext(image_stream.read(), detail=1, paragraph=True)
+    reader = _get_reader(requested_language)
+    results = reader.readtext(image_stream.read(), detail=1, paragraph=True)
 
     segments = []
     for result in results:
@@ -84,6 +95,7 @@ def perform_ocr():
         "text": extracted_text,
         "segments": segments,
         "filename": uploaded_file.filename,
+        "language": requested_language,
     }
     return jsonify(response)
 
