@@ -28,6 +28,8 @@
 
    ```bash
    flask --app app run
+
+   macos使用：python -m flask --app app run
    ```
 
 4. 打开浏览器访问 [http://localhost:5000](http://localhost:5000)。
