@@ -1,0 +1,8 @@
+easyocr==1.7.1
+Flask==3.0.3
+Werkzeug==3.0.3
+numpy==1.26.4
+opencv-python-headless==4.9.0.80
+torch==2.2.2
+scipy==1.11.4
+Pillow==10.3.0
