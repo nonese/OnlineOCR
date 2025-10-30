@@ -8,13 +8,23 @@ const output = document.getElementById("output");
 const confidenceTag = document.getElementById("confidence");
 const languageButtons = document.querySelectorAll(".language-switch__btn");
 
-let currentLanguage = "en";
+let currentLanguage = "zh";
 
-const formatConfidence = (segments) => {
-  if (!segments || !segments.length) return "No text detected";
-  const avg =
-    segments.reduce((acc, current) => acc + Number(current.confidence || 0), 0) / segments.length;
-  return `Avg confidence ${(avg * 100).toFixed(1)}%`;
+const formatConfidence = (averageConfidence, segments) => {
+  const hasAverage = typeof averageConfidence === "number" && !Number.isNaN(averageConfidence);
+  if (hasAverage) {
+    return `平均置信度 ${(averageConfidence * 100).toFixed(1)}%`;
+  }
+
+  if (segments && segments.length) {
+    const sum = segments.reduce((acc, current) => acc + Number(current.confidence || 0), 0);
+    const avg = sum / segments.length;
+    if (!Number.isNaN(avg) && Number.isFinite(avg)) {
+      return `平均置信度 ${(avg * 100).toFixed(1)}%`;
+    }
+  }
+
+  return "暂无置信度数据";
 };
 
 const setLanguage = (language) => {
@@ -37,14 +47,15 @@ const clearResults = () => {
 };
 
 const displayResults = (data) => {
-  output.textContent = data.text || "No text detected.";
-  confidenceTag.textContent = formatConfidence(data.segments);
+  const textContent = data.text && data.text.trim().length ? data.text : "未检测到文本。";
+  output.textContent = textContent;
+  confidenceTag.textContent = formatConfidence(data.average_confidence, data.segments);
   resultsSection.hidden = false;
 };
 
 const setLoading = (state) => {
   dropZone.classList.toggle("loading", state);
-  dropZone.dataset.status = state ? "Processing..." : "";
+  dropZone.dataset.status = state ? "正在处理…" : "";
 };
 
 const uploadImage = async (file) => {
@@ -61,8 +72,8 @@ const uploadImage = async (file) => {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: "Unknown error" }));
-      throw new Error(error.error || "Failed to process image");
+      const error = await response.json().catch(() => ({ error: "未知错误" }));
+      throw new Error(error.error || "图片处理失败");
     }
 
     const data = await response.json();
