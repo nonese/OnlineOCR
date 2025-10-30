@@ -1,4 +1,3 @@
-import io
 import os
 from datetime import datetime
 from functools import lru_cache
@@ -65,9 +64,8 @@ def perform_ocr():
     saved_path = _save_upload(uploaded_file)
 
     reader = _get_reader(requested_language)
-    image_bytes = saved_path.read_bytes()
-    image_stream = io.BytesIO(image_bytes)
-    results = reader.readtext(image_stream.read(), detail=1, paragraph=False)
+    # Pass the saved image path directly to EasyOCR so it can handle decoding.
+    results = reader.readtext(str(saved_path), detail=1, paragraph=False)
 
     segments = []
     confidence_total = 0.0
@@ -87,16 +85,24 @@ def perform_ocr():
             confidence_total += confidence_value
             confidence_count += 1
 
+        normalised_bbox = []
+        for point in bbox:
+            normalised_bbox.append([float(coordinate) for coordinate in point])
+
         segments.append(
             {
-                "bbox": bbox,
-                "text": text,
+                "bbox": normalised_bbox,
+                "text": str(text),
                 "confidence": confidence_value,
             }
         )
 
     extracted_text = "\n".join([segment["text"] for segment in segments]) if segments else ""
-    average_confidence = confidence_total / confidence_count if confidence_count else None
+    average_confidence = (
+        float(confidence_total / confidence_count)
+        if confidence_count
+        else None
+    )
 
     response = {
         "text": extracted_text,
