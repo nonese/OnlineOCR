@@ -6,12 +6,22 @@ const previewImage = document.getElementById("preview-image");
 const resultsSection = document.getElementById("results");
 const output = document.getElementById("output");
 const confidenceTag = document.getElementById("confidence");
+const languageButtons = document.querySelectorAll(".language-switch__btn");
+
+let currentLanguage = "en";
 
 const formatConfidence = (segments) => {
   if (!segments || !segments.length) return "No text detected";
   const avg =
     segments.reduce((acc, current) => acc + Number(current.confidence || 0), 0) / segments.length;
   return `Avg confidence ${(avg * 100).toFixed(1)}%`;
+};
+
+const setLanguage = (language) => {
+  currentLanguage = language;
+  languageButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.language === language);
+  });
 };
 
 const showPreview = (file) => {
@@ -40,6 +50,7 @@ const setLoading = (state) => {
 const uploadImage = async (file) => {
   const formData = new FormData();
   formData.append("image", file);
+  formData.append("language", currentLanguage);
   setLoading(true);
   clearResults();
 
@@ -96,3 +107,16 @@ dropZone.addEventListener("drop", (event) => {
   dropZone.classList.remove("dragover");
   handleFiles(event.dataTransfer.files);
 });
+
+languageButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const { language } = button.dataset;
+    if (!language || language === currentLanguage) {
+      return;
+    }
+    setLanguage(language);
+    clearResults();
+  });
+});
+
+setLanguage(currentLanguage);

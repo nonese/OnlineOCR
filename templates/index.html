@@ -23,6 +23,18 @@
       </header>
 
       <main class="card">
+        <section class="language-switch" aria-label="Recognition language">
+          <span class="language-switch__label">Recognition language</span>
+          <div class="language-switch__buttons">
+            <button type="button" class="language-switch__btn is-active" data-language="en">
+              English
+            </button>
+            <button type="button" class="language-switch__btn" data-language="zh">
+              中文
+            </button>
+          </div>
+        </section>
+
         <section class="uploader" id="drop-zone">
           <input id="file-input" type="file" accept="image/*" hidden />
           <div class="uploader__icon">
