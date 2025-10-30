@@ -64,13 +64,14 @@ def perform_ocr():
 
     saved_path = _save_upload(uploaded_file)
 
+    reader = _get_reader(requested_language)
     image_bytes = saved_path.read_bytes()
     image_stream = io.BytesIO(image_bytes)
-
-    reader = _get_reader(requested_language)
-    results = reader.readtext(image_stream.read(), detail=1, paragraph=True)
+    results = reader.readtext(image_stream.read(), detail=1, paragraph=False)
 
     segments = []
+    confidence_total = 0.0
+    confidence_count = 0
     for result in results:
         if len(result) == 3:
             bbox, text, confidence = result
@@ -81,21 +82,28 @@ def perform_ocr():
             # Skip unexpected result shapes to avoid breaking the API response.
             continue
 
+        confidence_value = float(confidence) if confidence is not None else None
+        if confidence_value is not None:
+            confidence_total += confidence_value
+            confidence_count += 1
+
         segments.append(
             {
                 "bbox": bbox,
                 "text": text,
-                "confidence": float(confidence) if confidence is not None else None,
+                "confidence": confidence_value,
             }
         )
 
     extracted_text = "\n".join([segment["text"] for segment in segments]) if segments else ""
+    average_confidence = confidence_total / confidence_count if confidence_count else None
 
     response = {
         "text": extracted_text,
         "segments": segments,
         "filename": uploaded_file.filename,
         "language": requested_language,
+        "average_confidence": average_confidence,
     }
     return jsonify(response)
 
