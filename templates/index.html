@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Online OCR</title>
+    <title>在线 OCR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,20 +16,20 @@
     <div class="page">
       <header class="hero">
         <div class="hero__text">
-          <h1>Online OCR</h1>
-          <p>Upload an image and let our OCR engine extract text instantly.</p>
+          <h1>在线 OCR</h1>
+          <p>上传图片，让我们的 OCR 引擎即时提取文本。</p>
         </div>
-        <div class="hero__badge">AI Powered</div>
+        <div class="hero__badge">AI 驱动</div>
       </header>
 
       <main class="card">
-        <section class="language-switch" aria-label="Recognition language">
-          <span class="language-switch__label">Recognition language</span>
+        <section class="language-switch" aria-label="识别语言">
+          <span class="language-switch__label">识别语言</span>
           <div class="language-switch__buttons">
-            <button type="button" class="language-switch__btn is-active" data-language="en">
-              English
+            <button type="button" class="language-switch__btn" data-language="en">
+              英文
             </button>
-            <button type="button" class="language-switch__btn" data-language="zh">
+            <button type="button" class="language-switch__btn is-active" data-language="zh">
               中文
             </button>
           </div>
@@ -45,24 +45,24 @@
               ></path>
             </svg>
           </div>
-          <p class="uploader__headline">Drag & drop your image here</p>
-          <p class="uploader__subtitle">or <button id="browse-btn">browse files</button></p>
+          <p class="uploader__headline">将图片拖拽到此处</p>
+          <p class="uploader__subtitle">或 <button id="browse-btn">选择文件</button></p>
         </section>
 
         <section class="preview" id="preview" hidden>
-          <img id="preview-image" alt="Preview" />
+          <img id="preview-image" alt="预览图像" />
         </section>
 
         <section class="results" id="results" hidden>
           <div class="results__header">
-            <h2>Extracted text</h2>
+            <h2>识别结果</h2>
             <span class="tag" id="confidence"></span>
           </div>
           <pre id="output"></pre>
         </section>
       </main>
 
-      <footer class="footer">Made with Flask &amp; EasyOCR</footer>
+      <footer class="footer">由 Flask 与 EasyOCR 驱动</footer>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
